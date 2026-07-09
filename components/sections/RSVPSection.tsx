@@ -1,18 +1,27 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
-import { Send, Heart, Mail, User, Users, Coffee, Sparkles } from 'lucide-react';
+import { Send, Heart, Mail, User, CheckCircle2, XCircle, Sparkles } from 'lucide-react';
 import { submitToGoogleSheets } from '@/lib/googleSheets';
+import { useSearchParams } from 'next/navigation';
 
-export default function RSVPSection() {
-  const { ref, inView } = useInView({ threshold: 0.15, triggerOnce: true });
+function RSVPFormContent() {
+  const searchParams = useSearchParams();
+  const urlName = searchParams.get('name');
+
   const [formData, setFormData] = useState({
     name: '',
-    guests: '1',
-    dietary: '',
+    attending: 'yes',
   });
+
+  useEffect(() => {
+    if (urlName) {
+      setFormData((prev) => ({ ...prev, name: urlName }));
+    }
+  }, [urlName]);
+
   const [submitted, setSubmitted] = useState(false);
   const [isHoveringSubmit, setIsHoveringSubmit] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -35,14 +44,13 @@ export default function RSVPSection() {
       await submitToGoogleSheets({
         formType: 'rsvp',
         name: formData.name,
-        guests: formData.guests,
-        dietary: formData.dietary,
+        attending: formData.attending,
       });
 
       setSubmitted(true);
       setTimeout(() => {
         setSubmitted(false);
-        setFormData({ name: '', guests: '1', dietary: '' });
+        setFormData({ name: urlName || '', attending: 'yes' });
       }, 4000);
     } catch (error) {
       setSubmitError('Unable to submit right now. Please try again.');
@@ -51,6 +59,148 @@ export default function RSVPSection() {
       setIsSubmitting(false);
     }
   };
+
+  return (
+    <AnimatePresence mode="wait">
+      {!submitted ? (
+        <motion.form
+          key="form"
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          exit={{ opacity: 0, scale: 0.95, y: -20 }}
+          transition={{ duration: 0.5 }}
+          onSubmit={handleSubmit}
+          className="relative z-10 space-y-8"
+        >
+          <div className="grid grid-cols-1 gap-8">
+            {/* Name Input */}
+            <div className="group relative">
+              <label className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#c07a54]">
+                <User className="h-4 w-4" /> Full Name
+              </label>
+              <input
+                type="text"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                placeholder="John & Jane Doe"
+                className="w-full rounded-2xl border border-[#efdcc9] bg-white/65 px-5 py-4 text-[#4a3b3c] placeholder-[#d5ab90]/70 outline-none transition-all duration-300 focus:border-[#c07a54] focus:bg-white focus:shadow-[0_10px_20px_rgba(192,122,84,0.12)] group-hover:bg-white/90"
+              />
+            </div>
+          </div>
+
+          <div className="mb-8">
+            <label className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#c07a54]">
+              <CheckCircle2 className="h-4 w-4" /> Will you attend?
+            </label>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <label
+                className={`relative flex cursor-pointer items-center justify-center gap-2 rounded-2xl border px-5 py-4 font-semibold transition-all duration-300 ${
+                  formData.attending === 'yes'
+                    ? 'border-[#c07a54] bg-[#c07a54] text-white shadow-[0_10px_20px_rgba(192,122,84,0.25)]'
+                    : 'border-[#efdcc9] bg-white/65 text-[#4a3b3c] hover:bg-white/90'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="attending"
+                  value="yes"
+                  checked={formData.attending === 'yes'}
+                  onChange={handleChange}
+                  className="hidden"
+                />
+                <CheckCircle2 className={`h-5 w-5 ${formData.attending === 'yes' ? 'text-white' : 'text-[#c07a54]'}`} />
+                Joyfully Accept
+              </label>
+              
+              <label
+                className={`relative flex cursor-pointer items-center justify-center gap-2 rounded-2xl border px-5 py-4 font-semibold transition-all duration-300 ${
+                  formData.attending === 'no'
+                    ? 'border-[#7b6259] bg-[#7b6259] text-white shadow-[0_10px_20px_rgba(123,98,89,0.25)]'
+                    : 'border-[#efdcc9] bg-white/65 text-[#4a3b3c] hover:bg-white/90'
+                }`}
+              >
+                <input
+                  type="radio"
+                  name="attending"
+                  value="no"
+                  checked={formData.attending === 'no'}
+                  onChange={handleChange}
+                  className="hidden"
+                />
+                <XCircle className={`h-5 w-5 ${formData.attending === 'no' ? 'text-white' : 'text-[#7b6259]'}`} />
+                Regretfully Decline
+              </label>
+            </div>
+          </div>
+
+          {/* Creative Submit Button */}
+          <div className="mt-10 flex justify-center pt-6">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onHoverStart={() => setIsHoveringSubmit(true)}
+              onHoverEnd={() => setIsHoveringSubmit(false)}
+              type="submit"
+              disabled={isSubmitting}
+              className="group relative inline-flex items-center justify-center gap-4 overflow-hidden rounded-full bg-[#bf7752] px-12 py-5 text-white shadow-[0_10px_30px_rgba(191,119,82,0.38)] transition-all hover:bg-[#ab6240] hover:shadow-[0_15px_40px_rgba(171,98,64,0.45)] border border-[#bf7752]"
+            >
+              <span className="relative z-10 font-bold tracking-[0.2em] uppercase text-sm">
+                {isSubmitting ? 'Sending...' : 'Send RSVP'}
+              </span>
+
+              <motion.div
+                animate={isHoveringSubmit ? { x: [0, 5, 0] } : {}}
+                transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut" }}
+                className="relative z-10"
+              >
+                <Send className="h-5 w-5" />
+              </motion.div>
+
+              <div className="absolute inset-0 z-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
+                <div className="relative h-full w-12 bg-white/30" />
+              </div>
+            </motion.button>
+          </div>
+
+          {submitError && (
+            <p className="text-center text-sm font-medium text-[#9f3a2f]">{submitError}</p>
+          )}
+        </motion.form>
+      ) : (
+        <motion.div
+          key="success"
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8, y: -20 }}
+          transition={{ type: "spring", bounce: 0.5 }}
+          className="relative z-10 flex flex-col items-center justify-center py-16 text-center"
+        >
+          <motion.div
+            animate={{
+              scale: [1, 1.2, 1],
+              rotate: [0, 10, -10, 0]
+            }}
+            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(191,119,82,0.28)]"
+          >
+            <Heart className="h-12 w-12 text-[#bf7752] fill-[#bf7752]" />
+          </motion.div>
+          <h3 className="font-serif text-4xl font-medium text-[#4a3b3c] mb-4">
+            Yay! We got it
+          </h3>
+          <p className="max-w-md text-lg text-[#7b6259]">
+            Thank you so much for confirming, {formData.name || 'dear guest'}!
+          </p>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+export default function RSVPSection() {
+  const { ref, inView } = useInView({ threshold: 0.15, triggerOnce: true });
 
   return (
     <section
@@ -80,7 +230,6 @@ export default function RSVPSection() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-4xl">
-
         {/* Title Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -98,203 +247,40 @@ export default function RSVPSection() {
               <Mail className="h-12 w-12 text-[#bd6f4e]" />
             </div>
 
-            {/* Tiny floating decorative elements around the image */}
+            {/* Tiny floating decorative elements */}
             <Sparkles className="absolute -top-2 -right-4 h-8 w-8 text-[#d28a63] animate-pulse" />
-            <Sparkles className="absolute -bottom-4 -left-2 h-6 w-6 text-[#b79bde] animate-pulse" />
-          </motion.div>
-          <motion.div
-            whileHover={{ scale: 1.05, rotate: 2 }}
-            className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#dcb08a]/45 bg-white/70 px-5 py-2.5 shadow-[0_10px_30px_rgba(197,135,95,0.18)] backdrop-blur-md"
-          >
-            <Mail className="h-5 w-5 text-[#bf7752]" />
-            <span className="text-sm font-bold uppercase tracking-[0.2em] text-[#bf7752]">
-              Join the Celebration
-            </span>
+            <Heart className="absolute -bottom-2 -left-2 h-6 w-6 text-[#bd6f4e] animate-bounce" style={{ animationDuration: '3s' }} />
           </motion.div>
 
-          <h2 className="font-serif text-5xl font-medium tracking-tight text-[#4d3732] md:text-7xl">
-            You are <span className="relative inline-block text-[#c16f58]">
-              Invited
-              <motion.svg className="absolute -bottom-2 md:-bottom-4 left-0 w-full"
-                viewBox="0 0 100 20" preserveAspectRatio="none"
-                initial={{ pathLength: 0, opacity: 0 }}
-                animate={inView ? { pathLength: 1, opacity: 1 } : {}}
-                transition={{ duration: 1.5, delay: 0.5, ease: "easeInOut" }}
-              >
-                <motion.path
-                  d="M0 10 Q 25 20, 50 10 T 100 10"
-                  fill="none"
-                  stroke="#d79b73"
-                  strokeWidth="4"
-                  strokeLinecap="round"
-                />
-              </motion.svg>
-            </span>
+          <h2 className="font-serif text-5xl md:text-6xl font-light text-[#4a3b3c] drop-shadow-sm mb-4">
+            Be Our Guest
           </h2>
-          <p className="mx-auto mt-8 max-w-lg text-lg text-[#7b6259] leading-relaxed">
-            Please respond by August 1, 2026. We would be honored to have you join our Christian wedding celebration.
-            <br/><br/>
-            RSVP: DERICK 077 8016052 | MADU 076 2645328
+          <div className="mx-auto h-px w-24 bg-gradient-to-r from-transparent via-[#c07a54] to-transparent mb-6" />
+          <p className="mx-auto max-w-2xl text-[#7b6259] md:text-lg">
+            We can't wait to celebrate with you. Please let us know if you can make it by August 5th.
           </p>
         </motion.div>
 
-        {/* 3D Glassmorphic Form Container */}
+        {/* Elegant Form Container */}
         <motion.div
-          initial={{ opacity: 0, y: 50, rotateX: 10 }}
-          animate={inView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
-          transition={{ duration: 1, delay: 0.2, type: "spring", bounce: 0.4 }}
-          className="relative perspective-[1000px]"
+          initial={{ opacity: 0, y: 40 }}
+          animate={inView ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 1, delay: 0.2 }}
+          className="relative mx-auto max-w-2xl rounded-[3rem] border border-white/60 bg-white/40 p-8 shadow-[0_30px_60px_rgba(189,126,86,0.12)] backdrop-blur-xl sm:p-12 md:p-16"
         >
-          {/* Animated Background Envelope Flap Shape */}
-          <div className="absolute -top-10 left-1/2 h-32 w-[90%] -translate-x-1/2 rounded-[2rem] bg-white/30 blur-md pointer-events-none" />
+          {/* Cute internal accents */}
+          <div className="absolute left-[-20%] top-[-20%] h-[300px] w-[300px] rounded-full bg-[#f2c59d]/25 blur-[60px]" />
+          <div className="absolute right-[-20%] bottom-[-20%] h-[300px] w-[300px] rounded-full bg-[#cfbfec]/25 blur-[60px]" />
 
-          <div className="relative overflow-hidden rounded-[3rem] border border-[#edd8bf] bg-[linear-gradient(150deg,rgba(255,255,255,0.84)_0%,rgba(255,244,228,0.78)_100%)] p-6 md:p-12 shadow-[0_20px_55px_rgba(192,128,88,0.2)] backdrop-blur-2xl">
+          <Suspense fallback={<div className="h-40 flex items-center justify-center"><Sparkles className="animate-spin text-[#c07a54]" /></div>}>
+            <RSVPFormContent />
+          </Suspense>
 
-            {/* Cute internal accents */}
-            <div className="absolute left-[-20%] top-[-20%] h-[300px] w-[300px] rounded-full bg-[#f2c59d]/25 blur-[60px]" />
-            <div className="absolute right-[-20%] bottom-[-20%] h-[300px] w-[300px] rounded-full bg-[#cfbfec]/25 blur-[60px]" />
-
-            <AnimatePresence mode="wait">
-              {!submitted ? (
-                <motion.form
-                  key="form"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95, y: -20 }}
-                  transition={{ duration: 0.5 }}
-                  onSubmit={handleSubmit}
-                  className="relative z-10 space-y-8"
-                >
-                  <div className="grid grid-cols-1 gap-8">
-                    {/* Name Input */}
-                    <div className="group relative">
-                      <label className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#c07a54]">
-                        <User className="h-4 w-4" /> Full Name
-                      </label>
-                      <input
-                        type="text"
-                        name="name"
-                        value={formData.name}
-                        onChange={handleChange}
-                        required
-                        placeholder="John & Jane Doe"
-                        className="w-full rounded-2xl border border-[#efdcc9] bg-white/65 px-5 py-4 text-[#4a3b3c] placeholder-[#d5ab90]/70 outline-none transition-all duration-300 focus:border-[#c07a54] focus:bg-white focus:shadow-[0_10px_20px_rgba(192,122,84,0.12)] group-hover:bg-white/90"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    {/* Guests Select */}
-                    <div className="group relative">
-                      <label className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#c07a54]">
-                        <Users className="h-4 w-4" /> Guests
-                      </label>
-                      <div className="relative">
-                        <select
-                          name="guests"
-                          value={formData.guests}
-                          onChange={handleChange}
-                          className="w-full appearance-none rounded-2xl border border-[#efdcc9] bg-white/65 px-5 py-4 pr-12 text-[#4a3b3c] outline-none transition-all duration-300 focus:border-[#c07a54] focus:bg-white focus:shadow-[0_10px_20px_rgba(192,122,84,0.12)] group-hover:bg-white/90 cursor-pointer"
-                        >
-                          <option value="1">1 Guest (Just Me)</option>
-                          <option value="2">2 Guests (Couple)</option>
-                          <option value="3">3 Guests (Plus One)</option>
-                          <option value="4">4 Guests (Family)</option>
-                        </select>
-                        <div className="pointer-events-none absolute inset-y-0 right-5 flex items-center text-[#c07a54]">
-                          <svg className="h-5 w-5 fill-current" viewBox="0 0 20 20">
-                            <path d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" />
-                          </svg>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Dietary Input */}
-                    <div className="group relative">
-                      <label className="mb-3 flex items-center gap-2 text-xs font-bold uppercase tracking-[0.2em] text-[#c07a54]">
-                        <Coffee className="h-4 w-4" /> Dietary Notes
-                      </label>
-                      <input
-                        type="text"
-                        name="dietary"
-                        value={formData.dietary}
-                        onChange={handleChange}
-                        placeholder="Allergies, Vegan, etc."
-                        className="w-full rounded-2xl border border-[#efdcc9] bg-white/65 px-5 py-4 text-[#4a3b3c] placeholder-[#d5ab90]/70 outline-none transition-all duration-300 focus:border-[#c07a54] focus:bg-white focus:shadow-[0_10px_20px_rgba(192,122,84,0.12)] group-hover:bg-white/90"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Creative Submit Button */}
-                  <div className="mt-10 flex justify-center pt-6">
-                    <motion.button
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onHoverStart={() => setIsHoveringSubmit(true)}
-                      onHoverEnd={() => setIsHoveringSubmit(false)}
-                      type="submit"
-                      disabled={isSubmitting}
-                      className="group relative inline-flex items-center justify-center gap-4 overflow-hidden rounded-full bg-[#bf7752] px-12 py-5 text-white shadow-[0_10px_30px_rgba(191,119,82,0.38)] transition-all hover:bg-[#ab6240] hover:shadow-[0_15px_40px_rgba(171,98,64,0.45)] border border-[#bf7752]"
-                    >
-                      <span className="relative z-10 font-bold tracking-[0.2em] uppercase text-sm">
-                        {isSubmitting ? 'Sending...' : 'Send RSVP'}
-                      </span>
-
-                      {/* Animated Send Icon */}
-                      <motion.div
-                        animate={isHoveringSubmit ? { x: [0, 5, 0] } : {}}
-                        transition={{ duration: 0.5, repeat: Infinity, ease: "easeInOut" }}
-                        className="relative z-10"
-                      >
-                        <Send className="h-5 w-5" />
-                      </motion.div>
-
-                      {/* Cool Shine Effect */}
-                      <div className="absolute inset-0 z-0 flex h-full w-full justify-center [transform:skew(-12deg)_translateX(-150%)] group-hover:duration-1000 group-hover:[transform:skew(-12deg)_translateX(150%)]">
-                        <div className="relative h-full w-12 bg-white/30" />
-                      </div>
-                    </motion.button>
-                  </div>
-
-                  {submitError && (
-                    <p className="text-center text-sm font-medium text-[#9f3a2f]">{submitError}</p>
-                  )}
-                </motion.form>
-              ) : (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.8, y: -20 }}
-                  transition={{ type: "spring", bounce: 0.5 }}
-                  className="relative z-10 flex flex-col items-center justify-center py-16 text-center"
-                >
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.2, 1],
-                      rotate: [0, 10, -10, 0]
-                    }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-white shadow-[0_10px_30px_rgba(191,119,82,0.28)]"
-                  >
-                    <Heart className="h-12 w-12 text-[#bf7752] fill-[#bf7752]" />
-                  </motion.div>
-                  <h3 className="font-serif text-4xl font-medium text-[#4a3b3c] mb-4">
-                    Yay! We got it
-                  </h3>
-                  <p className="max-w-md text-lg text-[#7b6259]">
-                    Thank you so much for confirming, {formData.name || 'dear guest'}! We are so excited to celebrate with you.
-                  </p>
-                </motion.div>
-              )}
-            </AnimatePresence>
-
-            {/* Corner cute dots */}
-            <div className="absolute left-6 top-6 h-2 w-2 rounded-full bg-[#e2b48f]" />
-            <div className="absolute right-6 top-6 h-2 w-2 rounded-full bg-[#c6b6e8]" />
-            <div className="absolute left-6 bottom-6 h-2 w-2 rounded-full bg-[#c6b6e8]" />
-            <div className="absolute right-6 bottom-6 h-2 w-2 rounded-full bg-[#e2b48f]" />
-          </div>
+          {/* Corner cute dots */}
+          <div className="absolute left-6 top-6 h-2 w-2 rounded-full bg-[#e2b48f]" />
+          <div className="absolute right-6 top-6 h-2 w-2 rounded-full bg-[#c6b6e8]" />
+          <div className="absolute left-6 bottom-6 h-2 w-2 rounded-full bg-[#c6b6e8]" />
+          <div className="absolute right-6 bottom-6 h-2 w-2 rounded-full bg-[#e2b48f]" />
         </motion.div>
       </div>
     </section>

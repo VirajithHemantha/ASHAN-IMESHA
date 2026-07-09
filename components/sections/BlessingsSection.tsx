@@ -1,10 +1,11 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';
 import { Heart, PenLine, Send, Stars, UserRound, Sparkles, Quote } from 'lucide-react';
 import { submitToGoogleSheets } from '@/lib/googleSheets';
+import { useSearchParams } from 'next/navigation';
 
 interface Blessing {
   id: string;
@@ -15,12 +16,22 @@ interface Blessing {
 
 const initialBlessings: Blessing[] = [];
 
-export default function BlessingsSection() {
+function BlessingsSectionContent() {
   const { ref, inView } = useInView({ threshold: 0.15, triggerOnce: true });
+
+  const searchParams = useSearchParams();
+  const urlName = searchParams.get('name');
 
   const [blessings, setBlessings] = useState<Blessing[]>(initialBlessings);
   const [newBlessing, setNewBlessing] = useState('');
   const [visitorName, setVisitorName] = useState('');
+
+  useEffect(() => {
+    if (urlName) {
+      setVisitorName(urlName);
+    }
+  }, [urlName]);
+
   const [submitted, setSubmitted] = useState(false);
   const [isHoveringSend, setIsHoveringSend] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -61,7 +72,7 @@ export default function BlessingsSection() {
 
         setBlessings([blessing, ...blessings]);
         setNewBlessing('');
-        setVisitorName('');
+        setVisitorName(urlName || '');
         setSubmitted(true);
 
         setTimeout(() => setSubmitted(false), 3000);
@@ -326,5 +337,17 @@ export default function BlessingsSection() {
         </div>
       </div>
     </section>
+  );
+}
+
+export default function BlessingsSection() {
+  return (
+    <Suspense fallback={
+      <section className="min-h-[50vh] flex items-center justify-center bg-[linear-gradient(180deg,#fff8ee_0%,#fff1df_45%,#fbe7d2_100%)]">
+        <Sparkles className="animate-spin text-[#c07a54]" />
+      </section>
+    }>
+      <BlessingsSectionContent />
+    </Suspense>
   );
 }

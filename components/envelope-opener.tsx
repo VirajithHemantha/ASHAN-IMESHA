@@ -1,7 +1,39 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useSearchParams } from 'next/navigation';
+
+function GreetingContent() {
+  const searchParams = useSearchParams();
+  const prefix = searchParams.get('prefix');
+  const name = searchParams.get('name');
+
+  if (!prefix && !name) return null;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -15 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 1, delay: 0.1 }}
+      className="absolute top-16 sm:top-24 left-0 right-0 z-50 flex flex-col items-center justify-center gap-2 px-4"
+    >
+      <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.3em] text-[#C9A227]">We cordially invite</span>
+      <span className="font-serif text-2xl sm:text-3xl lg:text-4xl text-[#fff7de] drop-shadow-md text-center leading-tight">
+        {prefix} {name}
+      </span>
+      <div className="h-px w-16 bg-[#C9A227]/50 mt-1" />
+    </motion.div>
+  );
+}
+
+function Greeting() {
+  return (
+    <Suspense fallback={null}>
+      <GreetingContent />
+    </Suspense>
+  );
+}
 
 interface EnvelopeOpenerProps {
   onEnvelopeOpen: () => void;
@@ -182,6 +214,8 @@ export function EnvelopeOpener({ onEnvelopeOpen }: EnvelopeOpenerProps) {
 
           {/* Main content */}
           <div className="relative z-20 flex min-h-screen flex-col items-center justify-center px-6">
+            <Greeting />
+            
             {/* Intro label */}
             <motion.div
               initial={{ opacity: 0, y: 18 }}

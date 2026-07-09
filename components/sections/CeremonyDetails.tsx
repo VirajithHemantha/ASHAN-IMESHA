@@ -15,6 +15,7 @@ export default function CeremonyDetails() {
     {
       key: 'church',
       title: 'Church',
+      dateLabel: 'August 11',
       timeLabel: 'Church Time',
       timeValue: '9:30 AM',
       timeSub: 'Holy wedding ceremony',
@@ -25,6 +26,7 @@ export default function CeremonyDetails() {
     {
       key: 'function',
       title: 'Reception',
+      dateLabel: 'August 15',
       timeLabel: 'Reception Time',
       timeValue: '7:00 PM',
       timeSub: 'Saturday, August 15, 2026',
@@ -160,8 +162,11 @@ export default function CeremonyDetails() {
                   >
                     <div className="absolute left-0 top-0 w-1 h-full bg-[#C9A227] scale-y-0 group-hover:scale-y-100 transition-transform origin-bottom duration-300" />
 
-                    <div className="mb-4">
+                    <div className="mb-4 flex items-center justify-between">
                       <p className="text-xs uppercase tracking-[0.25em] text-[#C9A227]/70">{group.title} Details</p>
+                      <span className="rounded-full bg-gradient-to-r from-[#C9A227]/20 to-[#C9A227]/5 px-3 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#f0d18b] border border-[#C9A227]/30 shadow-[0_0_10px_rgba(201,162,39,0.15)]">
+                        {group.dateLabel}
+                      </span>
                     </div>
 
                     <div className="space-y-5">
