@@ -70,7 +70,7 @@ export default function HeroSection() {
         >
           <p className="text-xs uppercase tracking-[0.28em] text-[#f0daaa]">Wedding Dates</p>
           <div className="mt-2 flex items-baseline justify-center gap-2">
-            <span className="font-serif text-xl text-[#fff7e8]/80 sm:text-2xl">Aug 11</span>
+            <span className="font-serif text-3xl font-medium text-white sm:text-4xl drop-shadow-md">Aug 11</span>
             <span className="text-[#f0daaa] text-sm">&amp;</span>
             <span className="font-serif text-3xl font-medium text-white sm:text-4xl drop-shadow-md">Aug 15, 2026</span>
           </div>
