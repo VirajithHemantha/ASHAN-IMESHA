@@ -14,7 +14,7 @@ export default function HeroSection() {
     >
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{ backgroundImage: 'url(/IMG_0951.JPG.jpeg)' }}
+        style={{ backgroundImage: 'url(/images/image-07.jpeg)' }}
       />
 
       <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,17,28,0.42)_0%,rgba(20,17,28,0.58)_55%,rgba(20,17,28,0.82)_100%)]" />
@@ -50,7 +50,7 @@ export default function HeroSection() {
           transition={{ duration: 1.1, delay: 0.1 }}
           className="font-serif text-4xl font-light leading-tight tracking-[0.08em] text-[#fff7e8] sm:text-6xl md:text-7xl lg:text-8xl"
         >
-          VIMUKTHI <span className="text-[#f0daaa]">&amp;</span> PIUMI
+          ASHAN <span className="text-[#f0daaa]">&amp;</span> IMESHA
         </motion.h1>
 
         <motion.p
@@ -69,7 +69,7 @@ export default function HeroSection() {
           className="mt-8 rounded-3xl border border-[#f0daaa]/45 bg-black/35 px-6 py-5 backdrop-blur-sm sm:px-10"
         >
           <p className="text-xs uppercase tracking-[0.28em] text-[#f0daaa]">Wedding Date</p>
-          <p className="mt-2 font-serif text-2xl text-[#fff7e8] sm:text-3xl">May 30, 2026</p>
+          <p className="mt-2 font-serif text-2xl text-[#fff7e8] sm:text-3xl">August 11, 2026</p>
         </motion.div>
 
         <motion.div

@@ -132,7 +132,9 @@ export default function RSVPSection() {
             </span>
           </h2>
           <p className="mx-auto mt-8 max-w-lg text-lg text-[#7b6259] leading-relaxed">
-            Please respond by May 20, 2026. We would be honored to have you join our Christian wedding celebration.
+            Please respond by August 1, 2026. We would be honored to have you join our Christian wedding celebration.
+            <br/><br/>
+            RSVP: DERICK 077 8016052 | MADU 076 2645328
           </p>
         </motion.div>
 

@@ -19,17 +19,17 @@ export default function CeremonyDetails() {
       timeValue: '9:30 AM',
       timeSub: 'Holy wedding ceremony',
       venueLabel: 'Church Venue',
-      venueValue: "St. Joseph's Church - Gonawila",
-      venueSub: 'Live location available',
+      venueValue: "St. Joseph's Church",
+      venueSub: 'Thillanduwa, Malwatra',
     },
     {
       key: 'function',
-      title: 'Function',
-      timeLabel: 'Function Time',
-      timeValue: '11:30 AM',
-      timeSub: 'Reception and celebration',
-      venueLabel: 'Function Venue',
-      venueValue: 'Sampath Banquet Hall',
+      title: 'Reception',
+      timeLabel: 'Reception Time',
+      timeValue: '7:00 PM',
+      timeSub: 'Saturday, August 15, 2026',
+      venueLabel: 'Reception Venue',
+      venueValue: 'Grandeeza Hotel, Kurana',
       venueSub: 'Live location available',
     },
   ];
@@ -71,8 +71,8 @@ export default function CeremonyDetails() {
               <div className="absolute -inset-3 rounded-t-[210px] rounded-b-[35px] border border-[#C9A227]/40 hidden md:block" />
 
               <Image
-                src="/images/IMG_2529.JPG.jpeg"
-                alt="Vimukthi and Piumi"
+                src="/images/image-02.jpeg"
+                alt="Ashan and Imesha"
                 fill
                 className="object-cover"
                 priority
@@ -90,13 +90,13 @@ export default function CeremonyDetails() {
                   <p className="text-[10px] uppercase tracking-[0.32em] text-[#f6dd9a] drop-shadow-[0_2px_10px_rgba(0,0,0,0.65)]">Blessed Union</p>
                 </div>
                 <h3 className="mt-5 font-serif text-4xl text-[#fff7de] drop-shadow-[0_4px_16px_rgba(0,0,0,0.75)]">
-                  VIMUKTHI <span className="text-[#f0d18b]">&amp;</span> PIUMI
+                  ASHAN <span className="text-[#f0d18b]">&amp;</span> IMESHA
                 </h3>
                 <p className="mt-4 text-sm leading-7 text-[#f5e6c8]/80">
-                  "Love is patient, love is kind." Join us as we exchange vows in faith, gratitude, and joy.
+                  "As long as we love one another, God will live with us and His love will be completed in us."
                 </p>
                 <div className="mt-8 h-px w-28 bg-[#C9A227]/50" />
-                <p className="mt-5 text-xs uppercase tracking-[0.28em] text-[#C9A227]">May 30, 2026</p>
+                <p className="mt-5 text-xs uppercase tracking-[0.28em] text-[#C9A227]">August 11, 2026</p>
               </div>
 
               <motion.div
@@ -194,24 +194,6 @@ export default function CeremonyDetails() {
               })}
             </div>
 
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={inView ? { opacity: 1 } : {}}
-              transition={{ duration: 1, delay: 0.9 }}
-              className="mt-12 overflow-hidden rounded-2xl border border-[#C9A227]/20 bg-[linear-gradient(135deg,rgba(74,15,24,0.4),rgba(26,4,8,0.8))] p-6 shadow-2xl backdrop-blur-lg relative"
-            >
-              <div className="absolute right-0 top-0 opacity-10">
-                <Crown className="w-32 h-32 -mt-8 -mr-8 text-[#C9A227]" />
-              </div>
-
-              <h4 className="text-xs uppercase tracking-widest text-[#C9A227] mb-3 font-semibold flex items-center gap-2">
-                <span className="w-6 h-[1px] bg-[#C9A227]"></span> Guest Notes
-              </h4>
-              <div className="space-y-2">
-                <p className="text-[#f5e6c8]/80 text-sm md:text-base"><span className="text-[#C9A227]">Dress Code:</span> Church Formal / Elegant Attire</p>
-                <p className="text-[#f5e6c8]/80 text-sm md:text-base"><span className="text-[#C9A227]">Reception:</span> Function starts at 11:30 AM at Sampath Banquet Hall</p>
-              </div>
-            </motion.div>
 
           </motion.div>
 
